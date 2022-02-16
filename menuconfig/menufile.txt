@@ -1,0 +1,5 @@
+和make menuconfig有关的文件
+Makefile 编译规则，即如何编译，相当于菜的做法
+Kconfig  内核配置的选项，相当于菜单
+.config  配置完内核后生成的配置选项，相当于点好的菜
+
