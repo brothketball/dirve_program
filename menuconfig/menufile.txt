@@ -1,5 +1,28 @@
 和make menuconfig有关的文件
+
 Makefile 编译规则，即如何编译，相当于菜的做法
 Kconfig  内核配置的选项，相当于菜单
 .config  配置完内核后生成的配置选项，相当于点好的菜
 
+make menuconfig读取哪些Kconfig文件由架构环境决定
+如通过export ARCH=arm 或 export ARCH=x86 来改变架构环境，即改变$ARCH变量
+而这些架构对应的Kconfig文件在 内核/Arch/$ARCH/ 目录下
+以arm举例介绍
+内核/arch/arm/configs/ 目录下有很多默认配置文件，相当于饭店的很多特色菜
+(/urs/src/内核/arch/arm 下没有configs目录，而下载的对应版本内核中有)
+将configs目录下的某一配置文件cp到内核目录下并命名为.config，则在编译的时候，
+会将该配置进行编译，相当于点了很多特色菜
+（configs目录下的一个文件就相当于一个.config，即configs目录下有多种默认配置
+可以选择，所以只需要复制一个文件为.config）
+
+为什么要复制成.config而不是其他文件名呢
+因为内核会默认读取Linux内核根目录下的.config作为默认的配置选项，所以我们不能
+改名字
+
+当我们复制的默认配置选项不符合我们的要求时怎么办，相当于特色菜不喜欢吃
+1、先复制到.config
+2、通过make menuconfig进行选择配置，然后会自动更新到.config里面
+
+怎么和Makefile文件建立的关系呢？
+当make menuconfig保存退出以后，Linux会将所有的配置选项以宏定义的形式保存在内
+核/include/generated/autoconf.h里面
