@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/dirve_program/misc_device/misc.ko := ld -r -EL --build-id=sha1  -T scripts/module.lds -o /home/pi/Gits/dirve_program/misc_device/misc.ko /home/pi/Gits/dirve_program/misc_device/misc.o /home/pi/Gits/dirve_program/misc_device/misc.mod.o;  true

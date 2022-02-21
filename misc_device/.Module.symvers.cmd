@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/dirve_program/misc_device/Module.symvers := sed 's/ko$$/o/' /home/pi/Gits/dirve_program/misc_device/modules.order | scripts/mod/modpost -m -a   -o /home/pi/Gits/dirve_program/misc_device/Module.symvers -e -i Module.symvers   -T -
