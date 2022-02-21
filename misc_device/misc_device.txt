@@ -1,0 +1,105 @@
+1、杂项设备是字符设备的一种，可以自动生成设备节点
+   可以通过 cat /proc/misc 来查看各个杂项设备
+2、杂项设备除了比字符设备代码简单，其主设备号是相同的，均为10.次设备号是不同
+   的。主设备号相同就可以节省内核的资源
+3、设备号包含主次设备号，主设备号在Linux系统里是唯一的，次设备号不一定唯一
+   设备号是计算机识别设备的一种方式，主设备相同的就被视为同一类设备
+   主设备号可以比作电话号码的区号，次设备号可以比作电话号码
+   可以通过 cat /proc/devices 查看各个主设备号
+4、杂项设备的描述
+   定义在内核源码路径：include/linux/miscdevice.h
+
+struct miscdevice  {
+	int minor;//此设备号
+	const char *name;//设备节点的名字
+	const struct file_operations *fops;//文件操作集
+	//以下基本上用不到
+	struct list_head list;
+	struct device *parent;
+	struct device *this_device;
+	const struct attribute_group **groups;
+	const char *nodename;
+	umode_t mode;
+};
+
+#define MISC_DYNAMIC_MINOR	255//该宏定义用于自动生成次设备号
+
+extern int misc_register(struct miscdevice *misc);//注册杂项设备
+extern void misc_deregister(struct miscdevice *misc);//注销杂项设备
+
+其中file_operations文件操作集定义在内核源码路径：include/linux/fs.h
+
+struct file_operations {
+	struct module *owner;
+	loff_t (*llseek) (struct file *, loff_t, int);
+	ssize_t (*read) (struct file *, char __user *, size_t, loff_t *);
+	ssize_t (*write) (struct file *, const char __user *, size_t, loff_t *);
+	ssize_t (*read_iter) (struct kiocb *, struct iov_iter *);
+	ssize_t (*write_iter) (struct kiocb *, struct iov_iter *);
+	int (*iopoll)(struct kiocb *kiocb, bool spin);
+	int (*iterate) (struct file *, struct dir_context *);
+	int (*iterate_shared) (struct file *, struct dir_context *);
+	__poll_t (*poll) (struct file *, struct poll_table_struct *);
+	long (*unlocked_ioctl) (struct file *, unsigned int, unsigned long);
+	long (*compat_ioctl) (struct file *, unsigned int, unsigned long);
+	int (*mmap) (struct file *, struct vm_area_struct *);
+	unsigned long mmap_supported_flags;
+	int (*open) (struct inode *, struct file *);
+	int (*flush) (struct file *, fl_owner_t id);
+	int (*release) (struct inode *, struct file *);
+	int (*fsync) (struct file *, loff_t, loff_t, int datasync);
+	int (*fasync) (int, struct file *, int);
+	int (*lock) (struct file *, int, struct file_lock *);
+	ssize_t (*sendpage) (struct file *, struct page *, int, size_t, loff_t *, int);
+	unsigned long (*get_unmapped_area)(struct file *, unsigned long, unsigned long, unsigned long, unsigned long);
+	int (*check_flags)(int);
+	int (*flock) (struct file *, int, struct file_lock *);
+	ssize_t (*splice_write)(struct pipe_inode_info *, struct file *, loff_t *, size_t, unsigned int);
+	ssize_t (*splice_read)(struct file *, loff_t *, struct pipe_inode_info *, size_t, unsigned int);
+	int (*setlease)(struct file *, long, struct file_lock **, void **);
+	long (*fallocate)(struct file *file, int mode, loff_t offset,
+			  loff_t len);
+	void (*show_fdinfo)(struct seq_file *m, struct file *f);
+#ifndef CONFIG_MMU
+	unsigned (*mmap_capabilities)(struct file *);
+#endif
+	ssize_t (*copy_file_range)(struct file *, loff_t, struct file *,
+			loff_t, size_t, unsigned int);
+	loff_t (*remap_file_range)(struct file *file_in, loff_t pos_in,
+				   struct file *file_out, loff_t pos_out,
+				   loff_t len, unsigned int remap_flags);
+	int (*fadvise)(struct file *, loff_t, loff_t, int);
+} __randomize_layout;
+里面的一个结构体成员都对应一个调用
+
+5、注册杂项设备的流程
+   1 填充miscdeivce结构体
+   2 填充file_operations结构体
+   3 注册杂项设备并生成设备节点
+
+简单模板：
+struct const file_operation xx_fops = {
+	.owner = THIS_MODULE
+	......
+};
+struct miscdevice xx_dev = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "xxx"
+	.fops = xx_fops
+};
+static int xxx_init()
+{
+	int ret;
+
+	ret = misc_register(&xx_dev);
+	if(ret<0)
+	{
+		printk(""misc regidter error\n);
+		return -1;
+	}
+	return 0;
+}
+void xxx_exit()
+{
+	misc_deregister(&xx_dev);
+}
