@@ -6,9 +6,11 @@
 #include<linux/uaccess.h>
 #include<linux/io.h>//对虚拟地址和物理地址的操作
 
-#define GPIO0 
+#define GPIO5_0 0x3f20001C  
+#define GPIO5_1 0x3f200020  
 
-unsigned int *vir_gpio0;
+unsigned int *vir_gpio5_0;
+unsigned int *vir_gpio5_1;
 
 int misc_open(struct inode *inode,struct file *file)
 {
@@ -37,7 +39,7 @@ ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t
 
 ssize_t misc_write(struct file *file,const char __user *ubuf,size_t size,loff_t *loff_t)
 {
-	char kbuf[64] = {0};
+	int kbuf[64] = {0};
 	if(raw_copy_from_user(kbuf,ubuf,size)!=0)
 	{
 		printk("copy_from_user error\n");
@@ -45,10 +47,12 @@ ssize_t misc_write(struct file *file,const char __user *ubuf,size_t size,loff_t 
 	}
 
 	printk("misc write\n");
-	printk("kbuf is %s\n",kbuf);
+	printk("kbuf is %d\n",kbuf[0]);
 
-	if(kbuf[0]==1)
-		*vir_gpio0	
+	if(kbuf[0]==0)
+		*vir_gpio5_0=0x12;
+	else if(kbuf[0]==1)
+		*vir_gpio5_1=0x12;	
 
 	return 0;
 };
@@ -82,14 +86,15 @@ static int misc_init(void)
 	
 	printk("misc register is succeed!\n");
 	
-	vir_gpio0 = ioremap(GPIO0,4)
-	if(vir_gpio == NULL)
+	vir_gpio5_0 = ioremap(GPIO5_0,4);
+	vir_gpio5_1 = ioremap(GPIO5_1,4);
+	if(vir_gpio5_0 == NULL || vir_gpio5_1 == NULL)
 	{
-		printk("GPIO0 ioremap error\n");
+		printk("GPIO5 ioremap error\n");
 		return -EBUSY;//EBUSY宏定义为16，表示设备和资源忙碌
 	}
 
-	printk("GPIO0 ioremap ok\n");
+	printk("GPIO5 ioremap ok\n");
 
 	return 0;
 }
@@ -98,7 +103,8 @@ static void misc_exit(void)
 {
 	misc_deregister(&misc_dev);
 
-	iounmap(vir_gpio0);
+	iounmap(vir_gpio5_0);
+	iounmap(vir_gpio5_1);
 
 	printk("misc bye!\n");
 }

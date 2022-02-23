@@ -9,7 +9,13 @@ int main(int argc,char *argv[])
 	int fd;
 
 	char rbuf[64] = {0};
-	char wbuf[64] = "this data is from app";
+	char wbuf[64] = {0};
+
+	if(agrc != 2)
+	{
+		printf("error! Usage:<app> <参数>");
+		return -1;
+	}
 
 	fd = open("/dev/hello_misc",O_RDWR);
 
@@ -18,6 +24,8 @@ int main(int argc,char *argv[])
 		perror("open error\n");
 		return fd;
 	}
+
+	wbuf[0] = atoi(argv[1]);//atoi用于将字符串转化为整型
 	
 	read(fd,rbuf,sizeof(rbuf));
 	printf("buf is %s\n",rbuf);

@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/simple_drive/drive/simp.ko := ld -r -EL --build-id=sha1  -T scripts/module.lds -o /home/pi/Gits/drive_program/simple_drive/drive/simp.ko /home/pi/Gits/drive_program/simple_drive/drive/simp.o /home/pi/Gits/drive_program/simple_drive/drive/simp.mod.o;  true

@@ -1,1 +1,1 @@
-cmd_/home/pi/Gits/drive_program/apptokernel/drive/modules.order := {   echo /home/pi/Gits/drive_program/apptokernel/drive/file_op.ko; :; } | awk '!x[$$0]++' - > /home/pi/Gits/drive_program/apptokernel/drive/modules.order
+cmd_/home/pi/Gits/drive_program/simple_drive/drive/modules.order := {   echo /home/pi/Gits/drive_program/simple_drive/drive/simp.ko; :; } | awk '!x[$$0]++' - > /home/pi/Gits/drive_program/simple_drive/drive/modules.order
