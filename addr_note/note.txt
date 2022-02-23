@@ -1,0 +1,34 @@
+1、在单片机和裸机中我们是如何操作硬件的？
+例如：
+unsigned int *p = 0x12345678;
+*p = 0x87654321;
+但在Linux上不行，在Linux上，如果想要操作硬件，需要先把物理地址转换为虚拟地址。
+因为Linux使能了MMU，所以我们在Linux上不能直接操作物理地址。
+MMU，Memory Management Unit，内存管理单元
+
+2、使能了MMU的好处
+	1）让虚拟地址成为了可能
+	2）可以让系统更加安全，因为有了MMU，上层应用看到的内存都是虚拟内存，应用不能直接访问硬件，保证了系统安全
+
+3、MMU非常复杂，如何完成物理地址到虚拟地址的转换呢？
+内核提供了相关的函数
+ioremap,iounmap 定义在内核源码下的include/asm-generic/io.h
+ioremap:把物理地址转换成虚拟地址
+iounmap:释放掉ioremap映射的地址
+
+static inline void __iomem *ioremap(phys_addr_t offset, size_t size)
+参数：
+phys_addr_t offset:映射物理地址的起始地址
+size_t size:要映射多大的内存空间
+返回值：
+成功返回虚拟地址的首地址
+失败返回NULL
+
+static inline void iounmap(void __iomem *addr)
+参数：
+*addr:要取消映射地址的首地址
+
+注意：物理地址只能被映射一次，多次映射会失败
+
+4、如何查看哪些物理地址被映射过了？
+可以通过 cat /proc/iomem 命令来查看
