@@ -11,13 +11,13 @@ int main(int argc,char *argv[])
 	char rbuf[64] = {0};
 	char wbuf[64] = {0};
 
-	if(agrc != 2)
+	if(argc != 2)
 	{
 		printf("error! Usage:<app> <参数>");
 		return -1;
 	}
 
-	fd = open("/dev/hello_misc",O_RDWR);
+	fd = open("/dev/simp_misc",O_RDWR);
 
 	if(fd < 0)
 	{

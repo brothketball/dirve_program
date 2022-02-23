@@ -6,11 +6,13 @@
 #include<linux/uaccess.h>
 #include<linux/io.h>//对虚拟地址和物理地址的操作
 
-#define GPIO5_0 0x3f20001C  
-#define GPIO5_1 0x3f200020  
+#define GPIO5_SEL2 0xfe200008
+#define GPIO5_SET0 0xfe20001C  
+#define GPIO5_CLR0 0xfe200028  
 
-unsigned int *vir_gpio5_0;
-unsigned int *vir_gpio5_1;
+unsigned int *vir_gpio5_sel2;
+unsigned int *vir_gpio5_set0;
+unsigned int *vir_gpio5_clr0;
 
 int misc_open(struct inode *inode,struct file *file)
 {
@@ -49,10 +51,12 @@ ssize_t misc_write(struct file *file,const char __user *ubuf,size_t size,loff_t 
 	printk("misc write\n");
 	printk("kbuf is %d\n",kbuf[0]);
 
-	if(kbuf[0]==0)
-		*vir_gpio5_0=0x12;
-	else if(kbuf[0]==1)
-		*vir_gpio5_1=0x12;	
+	*vir_gpio5_sel2=(0x001<<12);
+
+	if(kbuf[0]==1)
+		*vir_gpio5_set0=(0x1<<24);
+	else if(kbuf[0]==0)
+		*vir_gpio5_clr0=(0x1<<24);	
 
 	return 0;
 };
@@ -67,7 +71,7 @@ struct file_operations misc_fops = {
 
 struct miscdevice misc_dev = {
 	.minor = MISC_DYNAMIC_MINOR,
-	.name = "hello_misc",
+	.name = "simp_misc",
 	.fops =&misc_fops
 };
 
@@ -86,9 +90,10 @@ static int misc_init(void)
 	
 	printk("misc register is succeed!\n");
 	
-	vir_gpio5_0 = ioremap(GPIO5_0,4);
-	vir_gpio5_1 = ioremap(GPIO5_1,4);
-	if(vir_gpio5_0 == NULL || vir_gpio5_1 == NULL)
+	vir_gpio5_sel2 = ioremap(GPIO5_SEL2,4);
+	vir_gpio5_set0 = ioremap(GPIO5_SET0,4);
+	vir_gpio5_clr0 = ioremap(GPIO5_CLR0,4);
+	if((vir_gpio5_sel2 == NULL || vir_gpio5_set0 == NULL)||vir_gpio5_clr0 == NULL)
 	{
 		printk("GPIO5 ioremap error\n");
 		return -EBUSY;//EBUSY宏定义为16，表示设备和资源忙碌
@@ -103,8 +108,9 @@ static void misc_exit(void)
 {
 	misc_deregister(&misc_dev);
 
-	iounmap(vir_gpio5_0);
-	iounmap(vir_gpio5_1);
+	iounmap(vir_gpio5_sel2);
+	iounmap(vir_gpio5_set0);
+	iounmap(vir_gpio5_clr0);
 
 	printk("misc bye!\n");
 }
