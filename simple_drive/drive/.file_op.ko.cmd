@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/apptokernel/drive/file_op.ko := ld -r -EL --build-id=sha1  -T scripts/module.lds -o /home/pi/Gits/drive_program/apptokernel/drive/file_op.ko /home/pi/Gits/drive_program/apptokernel/drive/file_op.o /home/pi/Gits/drive_program/apptokernel/drive/file_op.mod.o;  true
