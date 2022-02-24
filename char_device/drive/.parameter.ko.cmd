@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/parameter_drive/drive/parameter.ko := ld -r -EL --build-id=sha1  -T scripts/module.lds -o /home/pi/Gits/drive_program/parameter_drive/drive/parameter.ko /home/pi/Gits/drive_program/parameter_drive/drive/parameter.o /home/pi/Gits/drive_program/parameter_drive/drive/parameter.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/char_device/drive/chrdev.ko := ld -r -EL --build-id=sha1  -T scripts/module.lds -o /home/pi/Gits/drive_program/char_device/drive/chrdev.ko /home/pi/Gits/drive_program/char_device/drive/chrdev.o /home/pi/Gits/drive_program/char_device/drive/chrdev.mod.o;  true
