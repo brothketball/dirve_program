@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/parameter_drive/drive/parameter.mod := { echo  /home/pi/Gits/drive_program/parameter_drive/drive/parameter.o;  echo; } > /home/pi/Gits/drive_program/parameter_drive/drive/parameter.mod
