@@ -1,0 +1,42 @@
+注册杂项设备：
+misc_register(&misc_dev);
+注销杂项设备：
+misc_deregister(&misc_dev);
+
+cdev结构体：描述字符设备的一个结构体，定义于内核源码 include/linux/cdev.h
+struct cdev {
+	struct kobject kobj;
+	struct module *owner;//属于哪个模块，如果是当前模块，则直接赋值THIS_MODULE
+	const struct file_operations *ops;//文件操作集，可以使用cdev_init函数赋值
+	struct list_head list;
+	dev_t dev;//设备号，使用cdev_add赋值
+	unsigned int count;//次设备号的数量，同上
+};
+
+步骤一：定义一个cdev结构体
+步骤二：初始化cdev结构体成员变量，使用cdev_init函数，也定义于cdev.h
+	void cdev_init(struct cdev *, const struct file_operations *);
+	参数：
+		第一个：要初始化的cdev
+		第二个：文件操作集
+		cdev_init函数定义中有 cdev->ops=fops 实际就是把文件操作集写给cdev的成员变量ops
+步骤三：使用cdev_add函数注册到内核，也定义于cdev.h
+	int cdev_add(struct cdev *, dev_t, unsigned);
+	参数：
+		第一个：cdev的结构体指针
+		第二个：设备号
+		第三个：次设备号的数量
+	注意：一定要后于申请设备号
+步骤四：注销cdev_del函数注销字符设备，也定义于cdev.h
+	void cdev_del(struct cdev *);
+	注意：一定要后于注销设备号
+
+不同于杂项设备，字符设备注册完以后不会自动生成设备节点用来访问和读写
+/proc/devices目录下的为设备名，而非设备节点
+设备节点在/dev下
+需要使用mknod命令创建一个设备节点
+格式：
+mknod 名称 类型 主设备号 次设备号
+举例：
+mknod /dev/test c 243 0
+其中设备节点提供设备号于设备关联，所以不一定需要同名，而c代表字符设备

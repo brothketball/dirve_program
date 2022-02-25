@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/char_device/reg_drive/chrdev.mod := { echo  /home/pi/Gits/drive_program/char_device/reg_drive/chrdev.o;  echo; } > /home/pi/Gits/drive_program/char_device/reg_drive/chrdev.mod
