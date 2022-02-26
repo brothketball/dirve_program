@@ -1,0 +1,68 @@
+如何实现自动创建设备节点，当加载模块时，在/dev目录下自动创建相应的设备文件
+device_create(struct class *cls, struct device *parent, dev_t devt,
+	      void *drvdata, const char *fmt, ...);
+
+1、怎么自动创建一个设备节点
+	在嵌入式Linux中使用mdev来实现设备节点文件的自动创建和删除
+
+2、什么是mdev？
+	mdev是udev的简化版本，是busybox中所带的程序，最适合用在嵌入式系统
+
+3、什么是udev？
+	udev是一种工具，它能够根据系统中硬件设备的状态动态更新设备文件，包括设备文件的创建、
+删除等。设备文件通常放在/dev目录下。使用udev后，在/dev目录下就只包含系统中真正存在的设备
+。udev一般用在PC上的Linux中，相对medv来说要复杂些。
+
+4、怎么自动创建设备节点？
+	自动创建设备节点分为两个步骤：
+	步骤一：使用class_create函数创建一个class的类。
+	步骤二：使用一个device_create函数在我们创建的类下面创建一个设备。
+	大致原理：
+	创建的class会生成在/sys/class目录下
+	在加载驱动模块时，应用层的udev或mdev会响应驱动中的device_create函数
+	在/dev目录下创建设备节点
+
+5、创建和删除类函数（创建的类在/sys/class目录下）
+	首先要创建一个class类结构体
+	class结构体定义在内核源码include/linux/device/class.h里面。class_create 是类创建函数
+	class_create 是一个宏定义，内容如下：
+	#define class_create(owner, name)		\
+	({						\
+		static struct lock_class_key __key;	\
+		__class_create(owner, name, &__key);	\
+	})
+	参数：
+	owner 一般为THIS_MODULE
+	name 类名
+	返回值：
+	指向结构体的class指针，也就是创建的类
+	
+	卸载驱动程序的时候需要删除类，类删除函数为 class_destroy ,原型如下：
+	void class_destroy(struct class *cls);
+	参数：
+	cls 要删除的类
+
+6、创建设备函数
+	使用device_create函数在这个类下创建一个设备，原型如下：
+	struct device *device_create(struct class *cls,
+				struct device *parent,
+				dev_t devt,
+	      		void *drvdata,
+				const char *fmt, ...);//是一个可变参数函数
+	参数：
+	class    是设备要创建在哪个类下面；
+	parent   是父设备，一般为NULL，即无父设备
+	devt     是设备号
+	drvdata  是设备可能会使用的一些数据，一般为NULL
+	fmt      是设备名字，若设置 fmt=xxx 的话，就会在生成 /dev/xxx 这个设备文件
+
+	返回值：
+	创建好的设备
+
+	删除设备函数 device_destroy 函数原型如下：
+	void device_destroy(struct class *cls, dev_t devt);
+	参数：
+	class 要删除的设备所在的类
+	devt 要删除的设备号
+	
+	注意：先device_destroy再class_destroy，因为device在class中

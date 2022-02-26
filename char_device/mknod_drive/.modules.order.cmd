@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/char_device/mknod_drive/modules.order := {   echo /home/pi/Gits/drive_program/char_device/mknod_drive/chrdev.ko; :; } | awk '!x[$$0]++' - > /home/pi/Gits/drive_program/char_device/mknod_drive/modules.order
