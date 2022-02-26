@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/platform_program/device/Module.symvers := sed 's/ko$$/o/' /home/pi/Gits/drive_program/platform_program/device/modules.order | scripts/mod/modpost -m -a   -o /home/pi/Gits/drive_program/platform_program/device/Module.symvers -e -i Module.symvers   -T -

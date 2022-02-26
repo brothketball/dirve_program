@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/platform_program/device/modules.order := {   echo /home/pi/Gits/drive_program/platform_program/device/device.ko; :; } | awk '!x[$$0]++' - > /home/pi/Gits/drive_program/platform_program/device/modules.order

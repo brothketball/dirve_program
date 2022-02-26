@@ -1,0 +1,54 @@
+1、平台总线注册一个device
+	device.c里面是硬件资源，这里的硬件资源是指寄存器的地址，中断号，时钟等硬件资源。
+	在Linux内核中，我们使用一个结构体来描述硬件资源的，platform_device
+	定义于内核源码include/linux/platform_device.h
+struct platform_device {
+	const char	*name;//平台总线进行匹配时用到的name，insmod时会在/sys/bus/platform/devices下生成名为name的文件
+	int		id;//设备id，一般写 -1，用于对相同设备进行编号
+	bool		id_auto;//不常用
+	struct device	dev;//内嵌的device结构体，没有对该结构体的release赋值的话会警告
+	u64		platform_dma_mask;//不常用
+	struct device_dma_parameters dma_parms;//不常用
+	u32		num_resources;//资源数量
+	struct resource	*resource;//描述device内的硬件资源的结构体
+
+	//以下都不常用
+	const struct platform_device_id	*id_entry;
+	char *driver_override; /* Driver name to force a match */
+
+	/* MFD cell pointer */
+	struct mfd_cell *mfd_cell;
+
+	/* arch specific additions */
+	struct pdev_archdata	archdata;
+};
+
+其中struct device dev是定义于内核源码include/linux/platform_device.h
+需要对该结构体中的release进行赋值
+void (*release)(struct device *dev)定义于内核源码include/linux/device.h
+release函数里可以随便写一段代码，如printk
+
+其中resource是定义于内核源码include/linux/ioport.h
+struct resource {
+	resource_size_t start;//资源的起始
+	resource_size_t end;//资源的结束
+	const char *name;//资源的名字（可选）
+	unsigned long flags;//资源的类型
+	//以下可不管
+	unsigned long desc;
+	struct resource *parent, *sibling, *child;
+};
+其中资源类型在宏定义中，如：
+#define IORESOURCE_IO		IO的内存
+#define IORESOURCE_MEM		表述一段物理内存，即物理地址（最常用）
+#define IORESOURCE_IRQ		表述中断（最常用）
+
+device注册函数：
+platform_device_register(struct platform_device *)
+参数为platform_device结构体的地址
+有返回值
+
+device注销函数：
+platform_device_unregister(struct platform_device *)
+参数为platform_device结构体的地址
+

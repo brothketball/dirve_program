@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/platform_program/device/device.mod := { echo  /home/pi/Gits/drive_program/platform_program/device/device.o;  echo; } > /home/pi/Gits/drive_program/platform_program/device/device.mod
