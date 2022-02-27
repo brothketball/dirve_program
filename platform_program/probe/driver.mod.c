@@ -26,9 +26,18 @@ MODULE_INFO(retpoline, "Y");
 static const struct modversion_info ____versions[]
 __used __section("__versions") = {
 	{ 0xbd97005b, "module_layout" },
+	{ 0xedc03953, "iounmap" },
+	{ 0x6f8e7e03, "misc_deregister" },
 	{ 0x459115a1, "platform_driver_unregister" },
 	{ 0x9ae801e0, "__platform_driver_register" },
+	{ 0x451e2b82, "misc_register" },
+	{ 0x1d37eeed, "ioremap" },
 	{ 0x7a16643f, "platform_get_resource" },
+	{ 0xae353d77, "arm_copy_from_user" },
+	{ 0x8f678b07, "__stack_chk_guard" },
+	{ 0x86332725, "__stack_chk_fail" },
+	{ 0x51a910c0, "arm_copy_to_user" },
+	{ 0x5f754e5a, "memset" },
 	{ 0xc5850110, "printk" },
 	{ 0xb1ad28e0, "__gnu_mcount_nc" },
 };
@@ -36,4 +45,4 @@ __used __section("__versions") = {
 MODULE_INFO(depends, "");
 
 
-MODULE_INFO(srcversion, "6E068EA3D34C07FDAA8DB6E");
+MODULE_INFO(srcversion, "35E0A3DB745E732E6E85BBB");

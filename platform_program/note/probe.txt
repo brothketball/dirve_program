@@ -11,3 +11,21 @@ extern struct resource *platform_get_resource(struct platform_device *,
 返回值是resource类型的指针
 
 2）注册杂项/字符设备，完善file_operation结构体，并生成设备节点
+
+注册之前要先登记到内核
+使用 request_mem_region(start,n,name) 函数，定义在内核源码 include/linux/ioport.h
+参数：
+start 起始地址
+n     长度
+name  名字
+返回值也是结构体resource
+
+注意：登记失败则需要释放，使用release_mem_region(start,n)函数
+	参数同上
+
+为什么需要登记：
+告诉内核，我们需要使用该寄存器，若其他驱动未使用，则登记成功；若已被使用，则登记失败
+但是寄存器，如操作该板子GPIO5需要使用GPSEL2、GPSET0、GPCLR0寄存器，直接登记会失败，因为内
+核可能已经登记过了，所以使用登记代码会登记失败，不使用即可，也可正常操作
+
+合理使用寄存器需要登记
