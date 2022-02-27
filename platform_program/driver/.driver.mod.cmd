@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/platform_program/driver/driver.mod := { echo  /home/pi/Gits/drive_program/platform_program/driver/driver.o;  echo; } > /home/pi/Gits/drive_program/platform_program/driver/driver.mod

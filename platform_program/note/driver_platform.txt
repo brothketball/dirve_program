@@ -1,0 +1,56 @@
+编写driver.c的思路
+	首先定义一个platform_driver的结构体变量，然后去实现结构体中各个成员变量（类比device）
+当driver和device匹配成功时，就会执行probe函数，所以匹配成功后的重点就在于probe函数的编写
+若未匹配成功，该结构体下的probe、remove等函数不会执行
+	platform_driver结构体原型
+struct platform_driver {
+	int (*probe)(struct platform_device *);
+//当driver和device匹配成功时，就会执行probe函数
+
+	int (*remove)(struct platform_device *);
+//当device或device任意一个remove（即rmmod驱动）时，就会执行remove函数
+
+	void (*shutdown)(struct platform_device *);
+//设备收到shutdown命令时，就会执行这个函数
+
+	int (*suspend)(struct platform_device *, pm_message_t state);
+//设备收到suspend（休眠）命令时，就会执行这个函数
+
+	int (*resume)(struct platform_device *);
+//设备收到resume（唤醒）命令时，就会执行这个函数
+
+	struct device_driver driver;
+
+
+	const struct platform_device_id *id_table;
+	bool prevent_deferred_probe;//不常用
+};
+
+其中device_driver结构体，定义于内核源码include/linux/device/driver.h
+struct device_driver {
+	const char		*name;//匹配设备时用到的名字
+	struct module *owner;//一般为THIS_MODULE
+
+	const struct of_device_id	*of_match_table;
+//其他成员变量暂不关注
+}
+
+其中platform_device_id结构体，定义于内核源码include/linux/mod_devicetable.h
+struct platform_device_id {
+	char name[PLATFORM_NAME_SIZE];
+//这个name也用于匹配设备，且优先级高于device_driver，当该name未定义时再使用device_driver
+//的name
+	
+	kernel_ulong_t driver_data;
+};
+
+注册该platform_driver结构体，使用platform_driver_register
+参数为该结构体地址，返回值<0则注册失败
+
+注销该platform_driver结构体，使用platform_driver_unregister
+参数为该结构体地址
+
+注意：
+1）insmod device.ko和driver.ko后，若匹配成功，则执行driver.c中的probe函数
+2）device.ko和driver.ko insmod没有前后之分
+3）probe可以用于打印、点灯、注册杂项设备字符设备等

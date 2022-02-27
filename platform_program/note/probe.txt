@@ -1,0 +1,13 @@
+编写probe函数的思路
+1）从device.c里面获取硬件资源
+方法一：直接获得（不安全，不推荐），probe的参数pdev指向device.c中的platform_device结构体
+方法二：使用函数获得（定义于内核源码include/linux/platform_device.h）
+extern struct resource *platform_get_resource(struct platform_device *,
+					      unsigned int, unsigned int);
+参数：
+第一个 *pdev
+第二个 资源类型，即flags
+第三个 在同类型资源中的位置，即排在同类资源的第几个，从0开始
+返回值是resource类型的指针
+
+2）注册杂项/字符设备，完善file_operation结构体，并生成设备节点
