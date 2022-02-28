@@ -1,0 +1,17 @@
+/dts-v1/;
+/plugin/;
+
+/{
+	fragment@0{
+		target-path = "/";
+		__overlay__{
+			test1:test{
+				#address-cells = <1>;
+				#size-cells = <1>;
+				compatible = "test";
+				reg = <0xfe200008 0x00000004>;
+				status = "okay";
+			};
+		};
+	};
+};
