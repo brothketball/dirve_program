@@ -16,4 +16,7 @@ DTS,DTSI---DTC--->DTB
 方法二：/sys/firmware/devicetree/base目录下
 两个目录下的内容相同
 
+.dts .dtsi文件都放在内核源码 arch/arm/boot/dts 目录下
+对对应板子的.dts文件进行添加自定义设备节点，该树莓派对应的为bcm2711-rpi-4-b.dts文件
+在make dtbs或make bcm2711-rpi-4-b.dtb之前，先make config或make defconfig等生成内核编译
 
