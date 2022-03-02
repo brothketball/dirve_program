@@ -20,3 +20,5 @@ DTS,DTSI---DTC--->DTB
 对对应板子的.dts文件进行添加自定义设备节点，该树莓派对应的为bcm2711-rpi-4-b.dts文件
 在make dtbs或make bcm2711-rpi-4-b.dtb之前，先make config或make defconfig等生成内核编译
 
+修改内核源码中的dts并编译后，按官方文档的构建内核文档执行
+最后重启，树莓派将使用我们修改后的内核
