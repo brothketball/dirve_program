@@ -1,0 +1,153 @@
+of操作函数定义在内核源码include/linux/of.h
+of开头的函数一般都是与设备树相关的函数
+
+设备都是以节点的形式“挂”到设备树上的，因此要想获得这个设备的其他属性信息，必须先获得这个
+设备的节点。
+Linux内核使用device_node结构体来描述一个节点，定义如下：
+struct device_node {
+	const char *name;/*节点名字*/
+	phandle phandle;
+	const char *full_name;/*节点全名*/
+	struct fwnode_handle fwnode;
+
+	struct	property *properties;/*属性*/
+	struct	property *deadprops;	/* removed properties */ /*remove属性*/
+	struct	device_node *parent;/*父节点*/
+	struct	device_node *child;/*子节点*/
+	struct	device_node *sibling;
+#if defined(CONFIG_OF_KOBJ)
+	struct	kobject kobj;
+#endif
+	unsigned long _flags;
+	void	*data;
+#if defined(CONFIG_SPARC)
+	unsigned int unique_id;
+	struct of_irq_controller *irq_trans;
+#endif
+};
+
+节点的属性信息里面保存了驱动所需的内容，因此对于属性值的提取非常重要，Linux内核中用结构体
+property表示属性，此结构体也同上，定义于of.h
+struct property {
+	char	*name;/*属性名字*/
+	int	length;/*属性长度*/
+	void	*value;/*属性值*/
+	struct property *next;/*下一个属性*/
+#if defined(CONFIG_OF_DYNAMIC) || defined(CONFIG_SPARC)
+	unsigned long _flags;
+#endif
+#if defined(CONFIG_OF_PROMTREE)
+	unsigned int unique_id;
+#endif
+#if defined(CONFIG_OF_KOBJ)
+	struct bin_attribute attr;
+#endif
+};
+
+获取设备树文件节点里面资源的步骤（上述两个结构体就是用于存放我们获取到的节点和属性）：
+步骤一 查找我们要找的节点
+步骤二 获取我们需要的属性值
+
+1、查找节点的常用of函数：
+1）of_find_node_by_path函数
+inline struct device_node *of_find_node_by_path(const char *path)
+参数：
+path：带有全路径的节点名，可以使用节点的别名，比如”/backlight“就是backlight这个节点的全路
+径
+返回值：
+成功：返回找到的节点 失败：返回NULL
+
+2）of_get_parent函数
+3）of_get_next_child函数
+配合1）函数使用
+
+2、查找节点属性的常用of函数：
+1）of_find_property函数
+extern struct property *of_find_property(const struct device_node *np,
+										 const char *name,
+										 int *lenp);
+参数：
+np：设备节点
+name：属性名字
+lenp：属性值的字节数
+返回值：
+找到的属性
+
+2） of_property_read_u8
+	of_property_read_u16
+	of_property_read_u32
+	of_property_read_u64
+有些属性只有一个整型值，这四个函数就是用于读取该类属性，如test设备节点则需要用***_u32读取
+分别用于读取u8 u16 u32 u64类型属性值
+
+int of_property_read_u8(const struct device_node *np,
+				       	const char *propname,
+				       	u8 *out_value)
+
+int of_property_read_u16(const struct device_node *np,
+						const char *propname,
+						u16 *out_value)
+
+int of_property_read_u32(const struct device_node *np,
+     					const char *propname,
+						u32 *out_value)
+
+int of_property_read_u64(const struct device_node *np,
+						const char *propname, 
+						u64 *out_value);
+
+参数：
+np：设备节点
+proname：要读取的属性名字
+out_value：读取到的属性值
+返回值：
+成功返回0，失败返回负值
+
+3） of_property_read_u8_array
+	of_property_read_u16_array
+	of_property_read_u32_array
+	of_property_read_u64_array
+这四个函数分别用于读取u8 u16 u32 u64类型的数组数据，比如大多数reg属性都是数组数据
+这四个函数可以一次性读取出reg属性中所有的属性
+
+int of_property_read_u8(const struct device_node *np,
+				       	const char *propname,
+				       	u8 *out_value,
+						size_t sz)
+
+int of_property_read_u16(const struct device_node *np,
+						const char *propname,
+						u16 *out_value,
+						size_t sz)
+
+int of_property_read_u32(const struct device_node *np,
+     					const char *propname,
+						u32 *out_value,
+						size_t sz)
+
+int of_property_read_u64(const struct device_node *np,
+						const char *propname, 
+						u64 *out_value,
+						size_t sz);
+
+参数：
+np：设备节点
+proname：要读取的属性名字
+out_value：读取到的属性值
+sz：要读取数组元素的数量
+返回值：
+成功返回0，失败返回负值
+
+4）of_property_read_string函数
+用于读取属性中的字符串值
+int of_property_read_string(const struct device_node *np,
+				   			const char *propname,
+				   			const char **out_string);
+
+参数：
+np：设备节点
+proname：要读取的属性名字
+out_string：读取到的字符串值
+返回值：
+成功返回0，失败返回负值
+
