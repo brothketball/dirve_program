@@ -152,5 +152,5 @@ out_string：读取到的字符串值
 成功返回0，失败返回负值
 
 3、物理地址转虚拟地址
-of_iomap函数，用于直接内存映射，效果同ioremap
-
+of_iomap函数，用于直接内存映射，效果同ioremap，定义于内核源码include/linux/of_address.h
+extern void __iomem *of_iomap(struct device_node *device, int index);
