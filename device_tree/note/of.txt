@@ -153,4 +153,9 @@ out_string：读取到的字符串值
 
 3、物理地址转虚拟地址
 of_iomap函数，用于直接内存映射，效果同ioremap，定义于内核源码include/linux/of_address.h
-extern void __iomem *of_iomap(struct device_node *device, int index);
+void __iomem *of_iomap(struct device_node *device, int index);
+参数：
+np：设备节点
+index：reg属性中要完成内存映射的段，如果reg属性只有一段的话index就设置0
+返回值：
+经过内存映射后的虚拟内存首地址，如果为NULL的话表示内存映射失败

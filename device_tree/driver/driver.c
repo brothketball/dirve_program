@@ -3,6 +3,7 @@
 #include<linux/platform_device.h>
 #include<linux/mod_devicetable.h>
 #include<linux/of.h>
+#include<linux/of_address.h>
 
 int size;
 u32 out_value[2]={0};
@@ -10,6 +11,8 @@ const char *str;
 
 struct device_node *test_deive_node;
 struct property *test_node_property;
+
+unsigned int *vir_gpsel2;
 
 int gpio_probe(struct platform_device *pdev)
 {
@@ -38,6 +41,14 @@ int gpio_probe(struct platform_device *pdev)
 	}
 	printk("out_value[0] is 0x%08x\n",out_value[0]);
 	printk("out_value[1] is 0x%08x\n",out_value[1]);
+
+	vir_gpsel2 = of_iomap(pdev->dev.of_node,0);
+	if(vir_gpsel2 == NULL)
+	{
+		printk("of_iomap is error\n");
+		return -1;
+	}
+
 	
 
 	return 0;
