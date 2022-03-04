@@ -4,6 +4,9 @@
 #include<linux/mod_devicetable.h>
 #include<linux/of.h>
 #include<linux/of_address.h>
+#include<linux/miscdevice.h>//这两个都是杂项设备必要的头文件
+#include<linux/fs.h>
+#include<linux/uaccess.h>
 
 int size;
 u32 out_value[2]={0};
@@ -13,11 +16,75 @@ struct device_node *test_deive_node;
 struct property *test_node_property;
 
 unsigned int *vir_gpsel2;
+unsigned int *vir_gpset0;
+unsigned int *vir_gpclr0;
+
+int misc_open(struct inode *inode,struct file *file)
+{
+	printk("hello misc_open\n");
+	return 0;
+}
+
+int misc_release(struct inode *inode,struct file *file)
+{
+	printk("bye misc_release\n");
+	return 0;
+}
+
+ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t)
+{
+	char kbuf[64] = "this data is from kernel";
+	if(raw_copy_to_user(ubuf,kbuf,strlen(kbuf))!=0)
+	{
+		printk("copy_to_user error\n");
+		return -1;
+	}
+
+	printk("misc read\n");
+	return 0;
+}
+
+ssize_t misc_write(struct file *file,const char __user *ubuf,size_t size,loff_t *loff_t)
+{
+	int kbuf[64] = {0};
+	if(raw_copy_from_user(kbuf,ubuf,size)!=0)
+	{
+		printk("copy_from_user error\n");
+		return -1;
+	}
+
+	printk("misc write\n");
+	printk("kbuf is %d\n",kbuf[0]);
+
+	*vir_gpsel2=(0x001<<12);
+
+	if(kbuf[0]==1)
+		*vir_gpset0=(0x1<<24);
+	else if(kbuf[0]==0)
+		*vir_gpclr0=(0x1<<24);	
+
+	return 0;
+};
+
+struct file_operations misc_fops = {
+	.owner = THIS_MODULE,
+	.open = misc_open,
+	.release = misc_release,
+	.read = misc_read,
+	.write = misc_write
+};
+
+struct miscdevice misc_dev = {
+	.minor = MISC_DYNAMIC_MINOR,
+	.name = "gpio_misc",
+	.fops =&misc_fops
+};
+
 
 int gpio_probe(struct platform_device *pdev)
 {
 	int ret = 0;
-
+	
 	printk("gpio_probe\n");
 	//直接获取节点名
 	//printk("node name is %s\n",pdev->dev.of_node->name);
@@ -33,7 +100,7 @@ int gpio_probe(struct platform_device *pdev)
 	}
 
 	/*获取reg属性*/
-	ret = of_property_read_u32_array(test_deive_node,"reg",out_value,2);
+	ret = of_property_read_u32_array(test_deive_node,"reg",out_value,6);
 	if(ret<0)
 	{
 		printk("of_property_read_u32_array is eeror\n");
@@ -41,15 +108,28 @@ int gpio_probe(struct platform_device *pdev)
 	}
 	printk("out_value[0] is 0x%08x\n",out_value[0]);
 	printk("out_value[1] is 0x%08x\n",out_value[1]);
+	printk("out_value[2] is 0x%08x\n",out_value[2]);
+	printk("out_value[3] is 0x%08x\n",out_value[3]);
+	printk("out_value[4] is 0x%08x\n",out_value[4]);
+	printk("out_value[5] is 0x%08x\n",out_value[5]);
 
 	vir_gpsel2 = of_iomap(pdev->dev.of_node,0);
-	if(vir_gpsel2 == NULL)
+	vir_gpset0 = of_iomap(pdev->dev.of_node,1);
+	vir_gpclr0 = of_iomap(pdev->dev.of_node,2);
+	if((vir_gpsel2 == NULL)||(vir_gpset0 == NULL)||(vir_gpclr0 == NULL))
 	{
 		printk("of_iomap is error\n");
 		return -1;
 	}
+	//注册杂项设备
+	ret = misc_register(&misc_dev);
+	if(ret < 0)
+	{
+		printk("misc register is error\n");
+		return -1;
+	}
 
-	
+	printk("misc register is ok\n");
 
 	return 0;
 }
@@ -88,7 +168,7 @@ static int gpio_driver_init(void)
 
 	printk("**********hello world*************\n");
 
-	ret  =platform_driver_register(&gpio_device);
+	ret = platform_driver_register(&gpio_device);
 	if(ret<0)
 	{
 		printk("platform_driver_register error\n");
