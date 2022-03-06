@@ -1,0 +1,76 @@
+	gpio子系统早于pinctrl子系统，pinctrl子系统是随着设备树的加入而出现的，gpio子系统也受
+设备树影响有了很大的改变
+	pinctrl子系统是所有引脚的驱动的配置，而不仅仅是GPIO引脚的。
+	注意：当pinctrl子系统将某个引脚设置为GPIO时，就可以使用gpio子系统对其进行操作
+<1>怎么在设备树中pinctrl和gpio子系统描述一个gpio，举例：
+test1:test{
+	#address-cells=<1>;
+	#size-cells=<1>;
+
+	compatible="test";
+	reg=<0x20ac000 0x0000004>;
+
+	pintrl-names="default";
+	pinctrl-0=<&pinctrl_test>;
+	test-gpio=<gpio1 3 GPIO_ACTIVE_LOW>;
+};
+其中test-gpio=<gpio1 3 GPIO_ACTIVE_LOW>;指的是
+第1组gpio的第3个引脚设置位低电平
+<2>常用的gpio子系统提供的api函数
+1、gpio_request函数
+功能：用于申请一个GPIO管脚
+函数原型：
+int gpio_request(unsigned gpio,const char *label)
+参数：
+gpio：要申请的gpio标号，使用of_get_named_gpio函数从设备树获取指定的GPIO属性信息，返回标号
+label：给gpio设置个名字
+返回值：0，申请成功；其他值，申请失败
+
+2、gpio_free函数
+功能：如果不使用某个GPIO了，那么可以调用gpio_free函数进行释放
+函数原型:
+void gpio_free(unsigned gpio)
+参数：
+gpio：要释放的gpio标号
+返回值：无
+
+3、gpio_direction_input函数
+功能：将某个GPIO设置为输入
+函数原型：int gpio_direction_input(unsigned gpio)
+参数：
+gpio：要设置的GPIO标号
+返回值：成功，返回0；失败，返回负值
+
+4、gpio_direction_output函数
+功能：将某个GPIO设置为输出
+函数原型：int gpio_direction_output(unsigned gpio,int value)
+参数：
+gpio：要设置的GPIO标号
+value：GPIO默认输出值
+返回值：成功，返回0；失败，返回负值
+
+5、gpio_get_value函数
+功能：获取某个GPIO的值（0/1）
+函数原型：int gpio_get_value(unsigned gpio)
+参数：
+gpio：要获取的GPIO标号
+返回值：成功，返回GPIO值；失败，返回负值
+
+6、gpio_set_value函数
+功能：设置某个GPIO的值（0/1）
+函数原型：void gpio_set_value(unsigned gpio,int value)
+参数：
+gpio：要设置的GPIO标号
+value：要设置的值
+返回值：无
+
+7、of_get_named_gpio函数
+功能：获取GPIO编号，因为Linux内核中有关GPIO的API函数都要使用GPIO标号，
+	此函数会将设备树中类似<&gpio1 3 GPIO_ACTIVE_LOW>的属性信息转换为对应的GPIO标号
+函数原型：
+int of_get_named_gpio(struct device_node *np,const *propname,int index)
+参数：
+np：设备节点
+propname：包含要获取GPIO信息的属性名
+index：一个属性中可能包含多个GPIO，该参数用于获取需要的GPIO标号，若只有一个GPIO则位为0
+返回值：成功，返回GPIO标号，失败返回一个负数
