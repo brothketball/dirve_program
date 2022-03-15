@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.mod := { echo  /home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.o;  echo; } > /home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.mod

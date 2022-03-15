@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.ko := ld -r -EL --build-id=sha1  -T scripts/module.lds -o /home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.ko /home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.o /home/pi/Gits/drive_program/pinctrl_gpio/driver/driver.mod.o;  true

@@ -1,0 +1,1 @@
+cmd_/home/pi/Gits/drive_program/pinctrl_gpio/driver/Module.symvers := sed 's/ko$$/o/' /home/pi/Gits/drive_program/pinctrl_gpio/driver/modules.order | scripts/mod/modpost -m -a   -o /home/pi/Gits/drive_program/pinctrl_gpio/driver/Module.symvers -e -i Module.symvers   -T -
