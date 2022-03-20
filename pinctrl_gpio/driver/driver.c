@@ -60,7 +60,7 @@ ssize_t misc_write(struct file *file,const char __user *ubuf,size_t size,loff_t 
 	if(kbuf[0]==1)
 		gpio_set_value(pinctrl_gpio,1);
 	else if(kbuf[0]==0)
-		gpio_set_value(pinctrl_gpio,1);
+		gpio_set_value(pinctrl_gpio,0);
 
 	return 0;
 };
@@ -97,7 +97,7 @@ int gpio_probe(struct platform_device *pdev)
 		return -1;
 	}
 
-	pinctrl_gpio = of_get_named_gpio(test_device_node,"pinctrl-gpio24",0);
+	pinctrl_gpio = of_get_named_gpio(test_device_node,"mygpio",0);
 	if(pinctrl_gpio < 0)
 	{
 		printk("of_get_named_gpio is error\n");
@@ -120,8 +120,8 @@ int gpio_probe(struct platform_device *pdev)
 		printk("misc register is error\n");
 		return -1;
 	}
-
 	
+	printk("misc register is ok!\n");
 
 	return 0;
 }
