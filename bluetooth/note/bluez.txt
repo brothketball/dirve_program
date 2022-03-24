@@ -1,0 +1,40 @@
+1、蓝牙协议栈分层结构，结构为：
+	1 配置文件	
+	2 RFCOMM/BNEP/SDP
+	3 L2CAP  SCO
+	4 主机控制接口（HCI）
+		     |-射频（RF）
+	5 蓝牙栈-|-链路控制器
+		     |-链路管理协议（LMP）
+
+2、	具体介绍
+	最下面3层是在硬件或固件中实现的
+	主机控制接口（Host Controller Interface，HCI）：规定主机如何与本地蓝牙设备交互和通信
+	L2CAP（Logical Link Control and Adaptation Protocol，逻辑链路控制和适配器协议）：提供接收来自其他蓝牙设备的数据包以及向其他蓝牙设备发送数据包的功能。类似UDP，应用程序可将其作为基于消息不可靠数据传输协议。在用户空间我们可以通过BSD套接字API来访问L2CAP。
+	BNEP：蓝牙网络封装协议
+	RFCOMM：射频通信协议（基于流的可靠协议，只能在30个端口上运行，RFCOMM用于模拟端口通信以及发送非成帧数据）
+	SDP：服务发现协议
+	SCO：同步面向连接层，用于发送音频
+	蓝牙配置文件：如
+		FTP：操纵和传输另一个系统的对象存储区（文件系统）中的对象（文件和文件夹）
+		人机接口配置文件：鼠标和键盘等设备提供支持
+		个域网配置：支持通过蓝牙链路联网
+		耳机配置文件：用于手机的蓝牙耳机提供支持
+		HCI设备和连接管理器、调试器、配置文件（源码/net/blurtooth目录下的mgmt.c）
+		蓝牙地址簇套接字配置文件（源码/net/blurtooth目录下的af_bluetooth.c）
+		SCO音频链路配置文件（源码/net/blurtooth目录下的sco.c）
+		L2CAP配置文件（源码/net/blurtooth目录下的l2cap_core.c、l2cap_sock.c）
+		HCI设备驱动程序配置文件，包含厂商专用的驱动程序以及通用驱动程序，蓝牙USB通用驱动程序btusb
+		等等。。。
+
+3、	HCI（主机控制器接口）层
+	HCI设备：蓝牙设备用结构hci_dev（在源码/include/net/bluetooth/hci_core.h中）表示，主要核心成员如下：
+	struct hci_dev{
+		unsigned long flags;//设置状态
+		__u8 bus;//与设备相关的总线，如USB对应HCI_USB PCI对应HCI_PCI
+		__u8 dev_type;//有两类蓝牙设备：基本速率设备 MAC / HPY设备
+		struct work_struct rx_work;//使用回调函数接收存储在HCI设备队列中数据包
+		struct work_struct tx_work;//使用回调函数发送存储在HCI设备队列中数据包
+		struct sk_buff_head	rx_q;//SKB接收队列
+	}
+	有关hci的宏定义在同目录下的hci.h中
