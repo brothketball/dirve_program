@@ -28,7 +28,7 @@
 		等等。。。
 
 3、	HCI（主机控制器接口）层
-	HCI设备：蓝牙设备用结构hci_dev（在源码/include/net/bluetooth/hci_core.h中）表示，主要核心成员如下：
+	HCI设备：蓝牙设备用结构体hci_dev（在源码/include/net/bluetooth/hci_core.h中）表示，主要核心成员如下：
 	struct hci_dev{
 		unsigned long flags;//设置状态
 		__u8 bus;//与设备相关的总线，如USB对应HCI_USB PCI对应HCI_PCI
@@ -38,3 +38,40 @@
 		struct sk_buff_head	rx_q;//SKB接收队列
 	}
 	有关hci的宏定义在同目录下的hci.h中
+
+4、HCI连接
+	HCI连接用结构体hci_conn（在源码/include/net/bluetooth/hci_core.h中），主要成员：
+	struct hci_conn {
+		struct list_head list;
+	
+		atomic_t	refcnt;//一个引用计数器
+	
+		bdaddr_t	dst;//蓝牙目标地址
+		__u8		dst_type;
+		bdaddr_t	src;
+		__u8		src_type;
+		bdaddr_t	init_addr;
+		__u8        type;//蓝牙连接类型：
+						//SCO_LINK 表示SCO连接
+						//ACL_LINK 表示ACL连接
+						//ESCO_LINK 表示扩展同步连接
+						//LE_LINK 表示LE连接2.6之后增加功能
+						//AMP_LINK 表示支持蓝牙AMP控制器
+	}
+
+5、L2CAP使用信道来提供多个数据流，而信道结构体l2cap_chan表示，有一个全局信道链表chan_list,表的访问，由全局读写锁chan_list_lock进行串行化，HCI数据类型数据包交给L2CAP层时。
+	在源码/include/net/bluetooth/l2cap.h中，每一个数据包的开头都包含这个结构体
+	struct l2cap_hdr{
+	//l2cap的报头结构体
+	__le16 len;
+	__le16 cid;
+	} __packed;
+
+6、ACL数据包的接收流程
+	ACL数据包的接收流程（SCO用于传输音频）：
+	数据包首先在HCI层被方法hci_acldata_packet()处理
+	然后在L2CAP层被方法l2cap_recv_acldata()处理
+	然后在L2CAP层被方法l2cap_recv_frame()处理
+	然后在L2CAP层被方法l2cap_data_channel()处理
+	然后L2CAP_MODE_ERTM类型的数据包被方法l2cap_data_recv()处理
+		L2CAP_MODE_BASIC类型的数据包被方法chan->ops->recv()处理
