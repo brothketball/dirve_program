@@ -50,6 +50,7 @@
 			irq_handler_t handler,//中断处理函数，当中断发生以后就会执行此中断处理函数
 			unsigned long flags,//中断标志
 			const char *name,//中断名字，设置后可/proc/interrupts文件中看到对应的中断名字
+				//中断次数可cat /proc/irq/(中断号)/spurious 查看
 			void *dev//若flags为IRQF_SHARED，则dev用于区分不同的中断
 			)
 		flags：宏定义在 源码/include/linux/inerrupt.h 里面查看所有的中断标志
@@ -58,4 +59,27 @@
 			0，中断申请成功；-EBUSY，中断已被申请；其他负值，中断申请失败
 	3、中断处理函数
 		使用request_irq函数申请中断的时候需要设置中断处理函数，中断处理函数格式如下所示：
-		
+		irqreturn_t (*irq_handler_t)(int, void *)
+
+		第一个参数是要中断处理函数相应的中断号。
+		第二个参数是指一个指向void的指针，也就是个通用指针，需要与request_irq函数的dev参数保持一致。
+		用于区分共享中断的不同设备，dev也可以指向设备数据结构。
+
+		中断处理函数的返回值为irqreturn_t类型，定义如下：
+		enum irqreturn{
+			IRQ_NONE = (0<<0),//不是该驱动的中断
+			IRQ_HANDLED = (1<<0),//正常处理中断
+			IRQ_WAKE_THREAD = (1<<1),//使用中断下文处理
+		};
+		typedef enum irqreturn irqreturn_t;
+		可以看出irqreturn_t是一个枚举类型，一共有三种返回值。一般中断服务函数返回值使用如下形式：
+		return IRQ_RETVAL(IRQ_HANDLED)
+	4、free_irq函数
+		中断使用完后需要通过free_irq函数释放中断。
+		如果中断不是共享的，那么free_irq会删除中断处理函数并禁止中断，原型如下：
+		void free_irq(unsigned int irq,void *dev)
+		参数：
+			irq：要释放的中断。
+			dev：如果中断设置为共享(IRQF_SHARED)的话，此参数用于区分具体的中断。
+				共享中断只有在释放最后中断处理函数的时候才会被禁止掉。
+		返回值：无
