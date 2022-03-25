@@ -28,68 +28,6 @@ irq_handler_t key_func_handler(int irq, void *args)
 	return IRQ_HANDLED;
 }
 
-int misc_open(struct inode *inode,struct file *file)
-{
-	printk("hello misc_open\n");
-	return 0;
-}
-
-int misc_release(struct inode *inode,struct file *file)
-{
-	printk("bye misc_release\n");
-	return 0;
-}
-
-ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t)
-{
-	char kbuf[64] = "this data is from kernel";
-	if(raw_copy_to_user(ubuf,kbuf,strlen(kbuf))!=0)
-	{
-		printk("copy_to_user error\n");
-		return -1;
-	}
-
-	printk("misc read\n");
-	return 0;
-}
-
-ssize_t misc_write(struct file *file,const char __user *ubuf,size_t size,loff_t *loff_t)
-{
-	int kbuf[64] = {0};
-	if(raw_copy_from_user(kbuf,ubuf,size)!=0)
-	{
-		printk("copy_from_user error\n");
-		return -1;
-	}
-
-	printk("misc write\n");
-	printk("kbuf is %d\n",kbuf[0]);
-
-	*vir_gpsel2=(0x001<<12);
-
-	if(kbuf[0]==1)
-		*vir_gpset0=(0x1<<24);
-	else if(kbuf[0]==0)
-		*vir_gpclr0=(0x1<<24);	
-
-	return 0;
-};
-
-struct file_operations misc_fops = {
-	.owner = THIS_MODULE,
-	.open = misc_open,
-	.release = misc_release,
-	.read = misc_read,
-	.write = misc_write
-};
-
-struct miscdevice misc_dev = {
-	.minor = MISC_DYNAMIC_MINOR,
-	.name = "gpio_misc",
-	.fops =&misc_fops
-};
-
-
 int gpio_probe(struct platform_device *pdev)
 {
 	int ret = 0;
@@ -109,10 +47,10 @@ int gpio_probe(struct platform_device *pdev)
 	}
 
 	//获得gpio编号
-	gpio_num = of_get_name_gpio(test_deive_node,"mykey",0);
+	gpio_num = of_get_named_gpio(test_deive_node,"mykey",0);
 	if(gpio_num < 0)
 	{
-		printk("of_get_name_gpio is error\n");
+		printk("of_get_named_gpio is error\n");
 		return -1;
 	}
 	//设置gpio为输入
@@ -129,18 +67,6 @@ int gpio_probe(struct platform_device *pdev)
 		printk("request_irq is error\n");
 		return -1;
 	}
-
-
-
-	//注册杂项设备
-	ret = misc_register(&misc_dev);
-	if(ret < 0)
-	{
-		printk("misc register is error\n");
-		return -1;
-	}
-
-	printk("misc register is ok\n");
 
 	return 0;
 }
@@ -193,7 +119,7 @@ static int gpio_driver_init(void)
 static void gpio_driver_exit(void)
 {
 	printk("************Bye!*******************\n");
-	free_irq(irq,NULL)
+	free_irq(irq,NULL);
 	platform_driver_unregister(&gpio_device);
 }
 
