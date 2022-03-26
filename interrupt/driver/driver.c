@@ -22,7 +22,7 @@ struct property *test_node_property;
 int gpio_num;
 int irq;
 
-irq_handler_t key_func_handler(int irq, void *args)
+irqreturn_t key_func_handler(int irq, void *args)
 {
 	printk("key_func_handler is ok!\n");
 	return IRQ_HANDLED;
