@@ -90,7 +90,7 @@ struct platform_driver gpio_device = {
 	.probe = gpio_probe,
 	.remove = gpio_remove,
 	.driver = {
-		.name = "gpio_test",
+		.name = "keys",
 		.owner = THIS_MODULE,
 		.of_match_table = of_match_table_test
 	},
