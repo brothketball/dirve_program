@@ -1,0 +1,23 @@
+一、tasklet相关知识点
+1、什么是tasklet？
+    tasklet是中断处理机制处理中断下文常用的一种方法，是一种特殊的软中断。
+处理中断下文的机制还要工作队列和中断
+2、怎么使用tasklet来设计中断下文？
+    流程：中断发生-中断上文处理紧急事情-调用tasklet-中断下文处理耗时事情
+    Linux将中断分为上半部分和下半部分，上半部分处理紧急事件，并可以调用tasklet来启动
+中断下文，调用tasklet后，其绑定的函数不会马上执行，而是出中断后，经过一个很短的不确定时间再执行
+3、tasklet定义
+    tasklet由tasklet_struct结构表示，每个结构体单独代表一个tasklet，
+定义在源码/include/linux/interrupt.h
+struct tasklet_struct
+{
+	struct tasklet_struct *next;//链表
+	unsigned long state;
+	atomic_t count;
+	bool use_callback;
+	union {
+		void (*func)(unsigned long data);
+		void (*callback)(struct tasklet_struct *t);
+	};
+	unsigned long data;
+};
