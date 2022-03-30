@@ -21,3 +21,9 @@ struct tasklet_struct
 	};
 	unsigned long data;
 };
+next：链表中的下一个tasklet，方便管理和设置tasklet
+state：tasklet的状态
+count：表示tasklet是否在激活状态，若未0，则在激活状态；若非0，则在非激活状态
+union：一个带有多成员的共用体，但是任何时候只能有一个成员带有值
+	void (*func)(unsigned long data)：结构体中的func成员是tasklet的绑定函数，data是它的唯一参数
+data：函数执行的时候传递的参数
