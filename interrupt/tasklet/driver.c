@@ -24,6 +24,14 @@ struct tasklet_struct key_tasklet;
 int gpio_num;
 int irq;
 
+//中断下文绑定函数
+void key_func_tasklet(unsigned long data)
+{
+	int i = 100;
+	while(i--)
+		printk("key_func_tasklet is %d\n",i);
+}
+
 //中断上文绑定函数
 irqreturn_t key_func_handler(int irq, void *args)
 {
@@ -31,14 +39,6 @@ irqreturn_t key_func_handler(int irq, void *args)
 	tasklet_schedule(&key_tasklet);
 	printk("key_func_handler is end\n");
 	return IRQ_HANDLED;
-}
-
-//中断下文绑定函数
-void key_func_tasklet(unsigned long data)
-{
-	int i = 100;
-	while(i--)
-		printk("key_func_tasklet is %d\n",i);
 }
 
 int gpio_probe(struct platform_device *pdev)
