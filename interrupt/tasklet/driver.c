@@ -38,7 +38,7 @@ void key_func_tasklet(unsigned long data)
 irqreturn_t key_func_handler(int irq, void *args)
 {
 	printk("key_func_handler is start\n");
-	tasklet_schedule(&key_tasklet);
+	tasklet_schedule(&key_tasklet);//先打印上下两句，再过很短的不缺的时间，再执行这句
 	printk("key_func_handler is end\n");
 	return IRQ_HANDLED;
 }
