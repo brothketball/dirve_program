@@ -29,7 +29,9 @@ void key_func_tasklet(unsigned long data)
 {
 	int i = 100;
 	while(i--)
+	{
 		printk("key_func_tasklet is %d\n",i);
+	}
 }
 
 //中断上文绑定函数
