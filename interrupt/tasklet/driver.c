@@ -27,7 +27,7 @@ int irq;
 //中断下文绑定函数
 void key_func_tasklet(unsigned long data)
 {
-	int i = 100;
+	int i = data;
 	while(i--)
 	{
 		printk("key_func_tasklet is %d\n",i);
@@ -83,7 +83,7 @@ int gpio_probe(struct platform_device *pdev)
 		return -1;
 	}
 
-	tasklet_init(&key_tasklet,key_func_tasklet,0);
+	tasklet_init(&key_tasklet,key_func_tasklet,100);
 
 	return 0;
 }
