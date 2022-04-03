@@ -56,6 +56,7 @@ int misc_release(struct inode *inode,struct file *file)
 
 ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t)
 {
+	printk("misc read\n");
 	//可中断阻塞
 	wait_event_interruptible(key_wq,wq_flags);
 
@@ -67,7 +68,6 @@ ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t
 
 	wq_flags = 0;//标志位清零，继续阻塞
 
-	printk("misc read\n");
 	return 0;
 }
 
@@ -194,6 +194,7 @@ static void gpio_driver_exit(void)
 {
 	printk("************Bye!*******************\n");
 	free_irq(irq,NULL);
+	misc_deregister(&misc_dev);
 	platform_driver_unregister(&gpio_device);
 }
 
