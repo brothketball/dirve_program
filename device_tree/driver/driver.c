@@ -182,6 +182,7 @@ static int gpio_driver_init(void)
 static void gpio_driver_exit(void)
 {
 	printk("************Bye!*******************\n");
+	misc_deregister(&misc_dev);
 	platform_driver_unregister(&gpio_device);
 }
 
