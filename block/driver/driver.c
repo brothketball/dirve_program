@@ -21,10 +21,12 @@ struct property *test_node_property;
 
 int gpio_num;
 int irq;
+int value = 0;//用于模拟管脚的状态
 
 irqreturn_t key_func_handler(int irq, void *args)
 {
 	printk("key_func_handler is ok!\n");
+	value = !value;
 	return IRQ_HANDLED;
 }
 
@@ -42,8 +44,7 @@ int misc_release(struct inode *inode,struct file *file)
 
 ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t)
 {
-	char kbuf[64] = "this data is from kernel";
-	if(raw_copy_to_user(ubuf,kbuf,strlen(kbuf))!=0)
+	if(raw_copy_to_user(ubuf,&value,strlen(value))!=0)
 	{
 		printk("copy_to_user error\n");
 		return -1;
