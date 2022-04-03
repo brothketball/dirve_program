@@ -8,9 +8,16 @@
 #include<linux/fs.h>
 #include<linux/uaccess.h>
 
+//gpio
 #include<linux/gpio.h>
 #include<linux/of_gpio.h>
+
+//中断
 #include<linux/interrupt.h>
+
+//等待队列
+#include<linux/wait.h>
+#include<linux/sched.h>
 
 int size;
 u32 out_value[2]={0};
@@ -19,14 +26,21 @@ const char *str;
 struct device_node *test_deive_node;
 struct property *test_node_property;
 
+//定义并初始化等待队列头
+DECLARE_WAIT_QUEUE_HEAD(key_wq);
+
 int gpio_num;
 int irq;
 int value = 0;//用于模拟管脚的状态
+
+int wq_flags = 0;//等待队列条件
 
 irqreturn_t key_func_handler(int irq, void *args)
 {
 	printk("key_func_handler is ok!\n");
 	value = !value;
+	wq_flags = 1;
+	wake_up(&key_wq);
 	return IRQ_HANDLED;
 }
 
@@ -44,11 +58,16 @@ int misc_release(struct inode *inode,struct file *file)
 
 ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t)
 {
+	//可中断阻塞
+	wait_event_interruptible(key_wq,wq_flags);
+
 	if(raw_copy_to_user(ubuf,&value,4)!=0)
 	{
 		printk("copy_to_user error\n");
 		return -1;
 	}
+
+	wq_flags = 0;//标志位清零，继续阻塞
 
 	printk("misc read\n");
 	return 0;
