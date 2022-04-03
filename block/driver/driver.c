@@ -20,8 +20,6 @@
 #include<linux/sched.h>
 
 int size;
-u32 out_value[2]={0};
-const char *str;
 
 struct device_node *test_deive_node;
 struct property *test_node_property;
@@ -61,7 +59,7 @@ ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t
 	//可中断阻塞
 	wait_event_interruptible(key_wq,wq_flags);
 
-	if(raw_copy_to_user(ubuf,&value,4)!=0)
+	if(raw_copy_to_user(ubuf,&value,sizeof(value))!=0)
 	{
 		printk("copy_to_user error\n");
 		return -1;
