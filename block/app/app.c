@@ -8,8 +8,9 @@ int main(int argc,char *argv[])
 {
 	int fd;
 
-	char rbuf[64] = {0};
+	//char rbuf[64] = {0};
 	//char wbuf[64] = {0};
+	int rbuf;
 
 	/*if(argc != 2)
 	{
@@ -28,7 +29,7 @@ int main(int argc,char *argv[])
 	//wbuf[0] = atoi(argv[1]);//atoi用于将字符串转化为整型
 	
 	read(fd,rbuf,sizeof(rbuf));
-	printf("buf is %s\n",rbuf);
+	printf("buf is %d\n",rbuf);
 
 	//write(fd,wbuf,sizeof(wbuf));
 
