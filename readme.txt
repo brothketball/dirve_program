@@ -59,3 +59,6 @@ static voif hello_exit(void)
 设备节点在 /dev 目录下（杂项设备一般自动生成在该目录下，字符设备手动生成不一定）
 而主次设备号可以通过 ls -lh /dev 查看得知，主次设备号依次在文件名后
 平台总线进行匹配时用到的name，insmod时会在/sys/bus/platform/devices下生成名为name的文件
+
+后台运行程序命令，cmd &
+如：./app &
