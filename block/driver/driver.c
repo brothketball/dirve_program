@@ -44,7 +44,7 @@ int misc_release(struct inode *inode,struct file *file)
 
 ssize_t misc_read(struct file *file,char __user *ubuf,size_t size,loff_t *loff_t)
 {
-	if(raw_copy_to_user(ubuf,&value,strlen(value))!=0)
+	if(raw_copy_to_user(ubuf,&value,4)!=0)
 	{
 		printk("copy_to_user error\n");
 		return -1;
