@@ -22,5 +22,28 @@
         struct lockdep_map lockdep_map;
     #endif
     };
+
+    第二步，初始化工作队列
     <1>宏DECLARE_WORK
     原型：#define DECLARE_WORK(n, f)
+    作用：静态定义并初始化工作队列
+    <2>宏INIT_WORK(_work,_func)
+    作用：动态定义并初始化工作结构
+    参数：
+        work：工作队列地址
+        func：工作函数
+
+    举例：
+    struct work_struct test;
+    在模块的初始化函数中：
+    INIT_WORK(&test,func);
+    相当于：
+    DECLARE_WORK(test,func);
+
+    <3>schedule_work
+    原型：int_schedule_work(struct work_struct *work);
+    作用：调度工作，把work_struct挂到CPU相关的工资结构队列链表上，等待工作者线程处理。
+    参数：_work工作队列地址；
+    需要注意的是，如果调度完工作，并不会马上执行，只是加到了共享的工作队列里面去，等轮到他才会执行。
+    如果我们多次调用相同的任务，假如上一次的任务还没有处理完成，那么多次调度相同的任务是无效的。
+    
