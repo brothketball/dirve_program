@@ -33,6 +33,8 @@
         work：工作队列地址
         func：工作函数
 
+    注意：func中的输入参数需要添加一个struct work_struct *work，原因不明
+
     举例：
     struct work_struct test;
     在模块的初始化函数中：
