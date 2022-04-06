@@ -32,7 +32,7 @@ int irq;
 		printk("key_func_tasklet is %d\n",i);
 	}
 }*/
-void key_func_work(unsigned long data)
+void key_func_work(struct work_struct *work)
 {
 	int i = 100;
 	while(i--)
