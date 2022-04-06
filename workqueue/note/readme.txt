@@ -40,6 +40,7 @@
     相当于：
     DECLARE_WORK(test,func);
 
+    第三步，调度工作
     <3>schedule_work
     原型：int_schedule_work(struct work_struct *work);
     作用：调度工作，把work_struct挂到CPU相关的工资结构队列链表上，等待工作者线程处理。
@@ -47,3 +48,6 @@
     需要注意的是，如果调度完工作，并不会马上执行，只是加到了共享的工作队列里面去，等轮到他才会执行。
     如果我们多次调用相同的任务，假如上一次的任务还没有处理完成，那么多次调度相同的任务是无效的。
     
+    注意：不同于tasklet，workqueue没有类似tasklet_kill();的API
+        但是和tasklet一样，也是先等中断上文执行完再过一段很短的时间，然后在执行中断下文
+        因为workqueue和tasklet一样，都是中断下文的实现方法
