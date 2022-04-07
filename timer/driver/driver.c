@@ -11,7 +11,7 @@ DEFINE_TIMER(test_timer,timer_func);
 static void timer_func(struct timer_list *timer)
 {
     	printk("This is timer_func\n");
-        mod_timer(&test_timer,jiffies + 1*HZ);
+        mod_timer(&test_timer,jiffies + 1*HZ);//重新激活定时器
 }
 
 /*功能的实现*/
