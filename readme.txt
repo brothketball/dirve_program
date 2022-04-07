@@ -62,3 +62,5 @@ static voif hello_exit(void)
 
 后台运行程序命令，cmd &
 如：./app &
+
+实时查看驱动日志：tail -f /var/log/syslog
