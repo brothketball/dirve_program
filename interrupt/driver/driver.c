@@ -12,9 +12,7 @@
 #include<linux/of_gpio.h>
 #include<linux/interrupt.h>
 
-int size;
-u32 out_value[2]={0};
-const char *str;
+#include<linux/timer.h>
 
 struct device_node *test_deive_node;
 struct property *test_node_property;
@@ -22,9 +20,23 @@ struct property *test_node_property;
 int gpio_num;
 int irq;
 
+static void timer_func(struct timer_list *timer);
+
+DEFINE_TIMER(test_timer,timer_func);
+
+static void timer_func(struct timer_list *timer)
+{
+    	printk("This is timer_func\n");//该函数执行说明20ms按键消抖已结束
+									   //该处用printk代替判断按键高低电平
+}
+
 irqreturn_t key_func_handler(int irq, void *args)
 {
 	printk("key_func_handler is ok!\n");
+
+	test_timer.expires = jiffies + msecs_to_jiffies(20);
+    add_timer(&test_timer);
+
 	return IRQ_HANDLED;
 }
 
