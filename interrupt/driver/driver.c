@@ -36,6 +36,7 @@ irqreturn_t key_func_handler(int irq, void *args)
 
 	test_timer.expires = jiffies + msecs_to_jiffies(20);
     add_timer(&test_timer);
+	printk("timer is added!\n");
 
 	return IRQ_HANDLED;
 }
