@@ -33,7 +33,7 @@ static void hello_exit(void)
 
 /*驱动模块的入口和出口*/
 module_init(hello_init);
-module_exit(heloo_exit);
+module_exit(hello_exit);
 
 /*声明信息*/
 MODULE_LICENSE("GPL");
