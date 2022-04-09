@@ -12,12 +12,6 @@ int main(int argc,char *argv[])
 
 	struct input_event test_event;
 
-	if(argc != 2)
-	{
-		printf("error! Usage:<app> <参数>");
-		return -1;
-	}
-
 	fd = open("/dev/input/event3",O_RDWR);
 
 	if(fd < 0)
