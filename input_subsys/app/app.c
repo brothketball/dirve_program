@@ -9,6 +9,7 @@
 int main(int argc,char *argv[])
 {
 	int fd;
+	int i = 10;
 
 	struct input_event test_event;
 
@@ -20,8 +21,11 @@ int main(int argc,char *argv[])
 		return fd;
 	}
 	
-	read(fd,&test_event,sizeof(test_event));
-	printf("type is %#x\n",test_event.type);
+	while(i--)
+	{
+		read(fd,&test_event,sizeof(test_event));
+		printf("type is %#x\n",test_event.type);
+	}	
 
 	close(fd);
 	return 0;
