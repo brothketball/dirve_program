@@ -10,7 +10,6 @@
 int main(int argc,char *argv[])
 {
 	int fd;
-	int i = 10;
 
 	struct input_event test_event;
 
@@ -22,12 +21,13 @@ int main(int argc,char *argv[])
 		return fd;
 	}
 	
-	while(i--)
+	while(1)
 	{
 		read(fd,&test_event,sizeof(test_event));
 		if(test_event.type==EV_KEY)
 		{
 			printf("type is %#x\n",test_event.type);
+			printf("value is %#x\n",test_event.value);
 		}
 	}	
 
