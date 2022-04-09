@@ -5,6 +5,7 @@
 #include<unistd.h>
 
 #include<linux/input.h>
+#include<linux/input-event-codes.h>
 
 int main(int argc,char *argv[])
 {
@@ -24,6 +25,7 @@ int main(int argc,char *argv[])
 	while(i--)
 	{
 		read(fd,&test_event,sizeof(test_event));
+		if(test_event.type=)
 		printf("type is %#x\n",test_event.type);
 	}	
 
