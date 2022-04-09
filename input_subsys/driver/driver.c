@@ -109,13 +109,13 @@ int gpio_probe(struct platform_device *pdev)
 	printk("input_register_device is ok\n");
 
 	return 0;
-}
-
+	
 error_input_register:
 	input_unregister_device(test_dev);
 
 error_irq_register:
 	free_irq(irq,NULL);
+}
 
 int gpio_remove(struct platform_device *pdev)
 {
