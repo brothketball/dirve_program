@@ -25,8 +25,10 @@ int main(int argc,char *argv[])
 	while(i--)
 	{
 		read(fd,&test_event,sizeof(test_event));
-		if(test_event.type=)
-		printf("type is %#x\n",test_event.type);
+		if(test_event.type==EV_KEY)
+		{
+			printf("type is %#x\n",test_event.type);
+		}
 	}	
 
 	close(fd);
