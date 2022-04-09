@@ -1,0 +1,121 @@
+一、使用输入子系统设计按键驱动
+    我们可以将开发板上的按键值设置为input-event-codes.h中任意一个按键的宏定义，如KEY_0
+    在编写input设备驱动时，我们需要先申请一个input_dev结构体变量
+    定义在源码/include/linux/input.h
+
+    struct input_dev {
+	const char *name;//设备名字
+	const char *phys;
+	const char *uniq;
+	struct input_id id;
+
+	unsigned long propbit[BITS_TO_LONGS(INPUT_PROP_CNT)];
+
+    //使用对set_bit将对应位置1，如第一个evbit，set_bit(EV_KEY,test_dev->evbit)
+    //指支持键盘输入
+	unsigned long evbit[BITS_TO_LONGS(EV_CNT)];//输入设备
+	unsigned long keybit[BITS_TO_LONGS(KEY_CNT)];//输入按键
+	unsigned long relbit[BITS_TO_LONGS(REL_CNT)];
+	unsigned long absbit[BITS_TO_LONGS(ABS_CNT)];
+	unsigned long mscbit[BITS_TO_LONGS(MSC_CNT)];
+	unsigned long ledbit[BITS_TO_LONGS(LED_CNT)];
+	unsigned long sndbit[BITS_TO_LONGS(SND_CNT)];
+	unsigned long ffbit[BITS_TO_LONGS(FF_CNT)];
+	unsigned long swbit[BITS_TO_LONGS(SW_CNT)];
+
+	unsigned int hint_events_per_packet;
+
+	unsigned int keycodemax;
+	unsigned int keycodesize;
+	void *keycode;
+
+	int (*setkeycode)(struct input_dev *dev,
+			  const struct input_keymap_entry *ke,
+			  unsigned int *old_keycode);
+	int (*getkeycode)(struct input_dev *dev,
+			  struct input_keymap_entry *ke);
+
+	struct ff_device *ff;
+
+	struct input_dev_poller *poller;
+
+	unsigned int repeat_key;
+	struct timer_list timer;
+
+	int rep[REP_CNT];
+
+	struct input_mt *mt;
+
+	struct input_absinfo *absinfo;
+
+	unsigned long key[BITS_TO_LONGS(KEY_CNT)];
+	unsigned long led[BITS_TO_LONGS(LED_CNT)];
+	unsigned long snd[BITS_TO_LONGS(SND_CNT)];
+	unsigned long sw[BITS_TO_LONGS(SW_CNT)];
+
+	int (*open)(struct input_dev *dev);
+	void (*close)(struct input_dev *dev);
+	int (*flush)(struct input_dev *dev, struct file *file);
+	int (*event)(struct input_dev *dev, unsigned int type, unsigned int code, int value);
+
+	struct input_handle __rcu *grab;
+
+	spinlock_t event_lock;
+	struct mutex mutex;
+
+	unsigned int users;
+	bool going_away;
+
+	struct device dev;
+
+	struct list_head	h_list;
+	struct list_head	node;
+
+	unsigned int num_vals;
+	unsigned int max_vals;
+	struct input_value *vals;
+
+	bool devres_managed;
+
+	ktime_t timestamp[INPUT_CLK_MAX];
+    };
+
+    input_allocate_device函数
+    作用：申请input_dev
+    原型：struct input_dev *input_allocate_device(void)
+    参数：无
+    返回值：申请到的input_dev
+
+    input_free_device函数
+    作用：释放已申请的input_dev
+    原型：struct input_free_device(struct input_dev *dev)
+    参数：需要释放的input_dev
+    返回值：无
+
+    input_register_device函数
+    作用：注册input_dev
+    原型：int input_register_device(struct input_dev *dev)
+    参数：要注册的input_dev
+    返回值：0，注册成功；负值，注册失败
+
+    input_unregister_device函数
+    作用：注销input_dev
+    原型：void input_unregister_device(struct input_dev *dev)
+    参数：要注销的input_dev
+    返回值：无
+
+    最终我们需要将事件上报，上报事件我们使用的函数要针对具体的事件来上报。
+    如，按键我们使用的是
+    void input_report_key(struct input_dev *dev,unsigned int code,int value)函数
+    其他如：
+    void input_report_rel(struct input_dev *dev,unsigned int code,int value)
+    void input_report_abs(struct input_dev *dev,unsigned int code,int value)
+    void input_report_ff_status(struct input_dev *dev,unsigned int code,int value)
+    void input_report_switch(struct input_dev *dev,unsigned int code,int value)
+    void input_report_sync(struct input_dev *dev,unsigned int code,int value)
+
+    注意：由于按键需要有按下和松开两个状态，所以要将中断触发改为上升沿和下降沿都触发
+        当我们上报事件以后，需要使用input_sync函数告诉内核input子系统上报结束，其本质为上报一个同步事件
+        原型：void input_sync(struc input_dev *dev)
+        参数：需要上报同步事件的input_dev
+        返回值：无
