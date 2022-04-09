@@ -34,7 +34,7 @@ static void timer_func(struct timer_list *timer)
 	int value;
 	value = !gpio_get_value(gpio_num);
 
-    input_report_key(test_deive,KEY_1,value);
+    input_report_key(test_dev,KEY_1,value);
 	input_sync(test_deive);
 }
 
