@@ -31,6 +31,6 @@ struct input_event {
 	__s32 value;//值
 };
 type 在该文件中有对应宏定义在/include/uapi/linux/input-event-codes.h中
-code 若为键盘，各按键对应宏定义在/include/uapi/linux/keyboard.h中
+code 若为键盘，各按键对应宏定义在/include/uapi/linux/input-event-codes.h中
 value 为1代表按下；为0代表抬起；为2代表长按
 hexdump /dev/input/键盘节点 的打印信息，最后四列依次是type code value
