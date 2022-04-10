@@ -42,7 +42,7 @@ irqreturn_t key_func_handler(int irq, void *args)
 {
 	printk("key_func_handler is ok!\n");
 
-    test_timer.expires = jiffies + 1*HZ;
+    test_timer.expires = jiffies + msecs_to_jiffies(20);
     add_timer(&test_timer);
 
 	printk("timer is add\n");
@@ -95,8 +95,8 @@ int gpio_probe(struct platform_device *pdev)
 
 	//初始化输入设备
 	test_dev->name = "test_key";
-	set_bit(EV_KEY,test_dev->evbit);
-	set_bit(KEY_1,test_dev->keybit);
+	__set_bit(EV_KEY,test_dev->evbit);
+	__set_bit(KEY_1,test_dev->keybit);
 
 	//注册输入设备
 	ret = input_register_device(test_dev);
