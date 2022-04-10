@@ -11,7 +11,7 @@
 
 	unsigned long propbit[BITS_TO_LONGS(INPUT_PROP_CNT)];
 
-    //使用对set_bit将对应位置1，如第一个evbit，set_bit(EV_KEY,test_dev->evbit)
+    //使用对 __set_bit 将对应位置1，如第一个evbit，set_bit(EV_KEY,test_dev->evbit)
     //指支持键盘输入
 	unsigned long evbit[BITS_TO_LONGS(EV_CNT)];//输入设备
 	unsigned long keybit[BITS_TO_LONGS(KEY_CNT)];//输入按键
