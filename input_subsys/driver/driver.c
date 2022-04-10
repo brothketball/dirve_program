@@ -83,7 +83,7 @@ int gpio_probe(struct platform_device *pdev)
 	printk("irq is %d\n",irq);
 
 	//申请中断
-	ret = request_irq(irq,key_func_handler,IRQF_TRIGGER_RISING|IRQF_TRIGGER_FALLING,"test_key",NULL);
+	ret = request_irq(irq,key_func_handler,IRQF_TRIGGER_RISING|IRQF_TRIGGER_FALLING,"test_irq",NULL);
 	if(ret < 0)
 	{
 		printk("request_irq is error\n");
@@ -94,7 +94,7 @@ int gpio_probe(struct platform_device *pdev)
 	test_dev = input_allocate_device();
 
 	//初始化输入设备
-	test_dev->name = "test_key";
+	test_dev->name = "test_key_1";
 	__set_bit(EV_KEY,test_dev->evbit);
 	__set_bit(KEY_1,test_dev->keybit);
 
